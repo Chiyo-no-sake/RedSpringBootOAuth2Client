@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>it.redbyte</groupId>
+  <artifactId>red-spring-boot-oauth2-client</artifactId>
+  <versioning>
+    <release>${revision}</release>
+    <versions>
+      <version>${revision}</version>
+    </versions>
+    <lastUpdated>20220515202421</lastUpdated>
+  </versioning>
+</metadata>
