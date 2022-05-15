@@ -60,4 +60,12 @@ class LinkedinOAuth2Provider: OAuth2Provider {
 }
 ```
 
-3) DONE!! Now the login endpoint should be exposed at ```{baseUrl}/oauth2/authentication/linkedin``` and the callback at ```/login/oauth2/code/linkedin```
+3) Add following annotations to your applications
+
+```java
+@ConfigurationPropertiesScan(basePackages = ["it.redbyte", "your.project.package"])
+@ComponentScan(basePackages = ["it.redbyte", "your.project.package"])
+```
+
+
+6) DONE!! Now the login endpoint should be exposed at ```{baseUrl}/oauth2/authentication/linkedin``` and the callback at ```/login/oauth2/code/linkedin```
