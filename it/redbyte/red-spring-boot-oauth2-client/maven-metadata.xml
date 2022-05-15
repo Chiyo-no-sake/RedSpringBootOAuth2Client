@@ -3,10 +3,11 @@
   <groupId>it.redbyte</groupId>
   <artifactId>red-spring-boot-oauth2-client</artifactId>
   <versioning>
-    <release>1.0.0</release>
+    <release>${revision}</release>
     <versions>
       <version>1.0.0</version>
+      <version>${revision}</version>
     </versions>
-    <lastUpdated>20220515212358</lastUpdated>
+    <lastUpdated>20220515212745</lastUpdated>
   </versioning>
 </metadata>
