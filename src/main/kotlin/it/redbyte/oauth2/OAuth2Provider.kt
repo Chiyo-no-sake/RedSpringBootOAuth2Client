@@ -1,4 +1,4 @@
-package it.redbyte
+package it.redbyte.oauth2
 
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component

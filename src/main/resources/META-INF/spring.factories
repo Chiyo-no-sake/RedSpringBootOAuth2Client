@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=it.redbyte.oauth2.OAuth2ClientAutoConfiguration

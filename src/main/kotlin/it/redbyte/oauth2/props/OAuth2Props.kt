@@ -1,4 +1,4 @@
-package it.redbyte.props
+package it.redbyte.oauth2.props
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding

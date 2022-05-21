@@ -1,6 +1,6 @@
-package it.redbyte.controllers
+package it.redbyte.oauth2.controllers
 
-import it.redbyte.OAuth2Provider
+import it.redbyte.oauth2.OAuth2Provider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.lang.reflect.Method
 
 @Controller
-class OAuth2PropsOAuth2LoginController(
+class OAuth2LoginController(
     val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     providers: List<OAuth2Provider>
 ) {

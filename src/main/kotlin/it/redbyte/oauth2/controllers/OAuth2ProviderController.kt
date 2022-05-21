@@ -1,9 +1,9 @@
-package it.redbyte.controllers
+package it.redbyte.oauth2.controllers
 
-import it.redbyte.OAuth2Provider
-import it.redbyte.SessionTokenGenerator
-import it.redbyte.exceptions.MissingPropertiesException
-import it.redbyte.props.OAuth2Props
+import it.redbyte.oauth2.OAuth2Provider
+import it.redbyte.oauth2.SessionTokenGenerator
+import it.redbyte.oauth2.exceptions.MissingPropertiesException
+import it.redbyte.oauth2.props.OAuth2Props
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletResponse
 
 @Controller
 class OAuth2ProviderController(
-    val requestMappingHandlerMapping: RequestMappingHandlerMapping,
-    val oAuth2Props: OAuth2Props,
-    val tokenService: SessionTokenGenerator,
+    private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
+    private val oAuth2Props: OAuth2Props,
+    private val tokenService: SessionTokenGenerator,
     providers: List<OAuth2Provider>
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
