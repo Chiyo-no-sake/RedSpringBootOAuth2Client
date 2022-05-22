@@ -14,9 +14,23 @@ data class OAuth2Props(
     data class OAuth2ProviderProps(
         val authUrl: String,
         val clientId: String,
+        val clientSecret: String,
         val redirectUri: String,
+        val tokenUrl: String,
         val scopes: List<String>,
-    )
+    ) {
+        companion object {
+            // default value to use for not initialized non-null fields
+            val defaultProviderProps: OAuth2ProviderProps = OAuth2ProviderProps(
+                "localhost",
+                "",
+                "",
+                "localhost",
+                "localhost",
+                arrayListOf()
+            )
+        }
+    }
 
     @ConstructorBinding
     data class SessionCookieProps(

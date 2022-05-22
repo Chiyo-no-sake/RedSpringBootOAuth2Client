@@ -1,10 +1,10 @@
 package it.redbyte.oauth2.controllers
 
-import it.redbyte.oauth2.OAuth2Provider
 import it.redbyte.oauth2.SessionTokenGenerator
-import it.redbyte.oauth2.exceptions.MissingPropertiesException
-import it.redbyte.oauth2.props.OAuth2Props
+import it.redbyte.oauth2.components.OAuth2Provider
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.DependsOn
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -14,52 +14,53 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import java.lang.reflect.Method
-import javax.servlet.http.Cookie
+import javax.annotation.PostConstruct
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import kotlin.reflect.jvm.javaType
 
 
 @Controller
-class OAuth2ProviderController(
+@Order(3)
+class OAuth2AuthorizationController(
     private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
-    private val oAuth2Props: OAuth2Props,
     private val tokenService: SessionTokenGenerator,
-    providers: List<OAuth2Provider>
+    private val providers: List<OAuth2Provider>
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    init {
+    @PostConstruct
+    fun initializeProviders(){
         providers.forEach {
             logger.info("Initializing provider authentication ${it.providerName}")
+            it.authorizationController = this
 
             val requestAccessMappingInfo = RequestMappingInfo
                 .paths("oauth2/authorization/${it.providerName}")
                 .methods(RequestMethod.GET)
                 .build()
 
-            val requestAccessMethod: Method = this.javaClass.getMethod(
-                "requestAccess",
-                HttpServletRequest::class.java,
-                HttpServletResponse::class.java,
-                UserDetails::class.java
+            val requestAccessMethod: Method = it.javaClass.getMethod(
+                OAuth2Provider::handleAccessRequest.name,
+                *OAuth2Provider::handleAccessRequest.parameters.map {
+                    Class.forName(it.type.javaType.typeName)
+                }.drop(1).toTypedArray()
             )
 
-            requestMappingHandlerMapping.registerMapping(requestAccessMappingInfo, this, requestAccessMethod)
+            requestMappingHandlerMapping.registerMapping(requestAccessMappingInfo, it, requestAccessMethod)
         }
-
     }
 
-    fun requestAccess(
+    fun handleRequestAccess(
+        provider: OAuth2Provider,
         request: HttpServletRequest,
         response: HttpServletResponse,
         @AuthenticationPrincipal user: UserDetails?
     ) {
-        val providerName = request.requestURI.split("/").last()
+        val providerName = provider.providerName
         logger.info("Requesting access to provider ${providerName}")
 
-        val props = oAuth2Props.providers[providerName]
-            ?: throw MissingPropertiesException("Missing provider in properties: $providerName")
-
+        val props = provider.props
         val clientId = props.clientId
         val redirectUri = props.redirectUri
 
@@ -69,18 +70,21 @@ class OAuth2ProviderController(
 
         scope = scope.substring(0, scope.length - 1)
 
-        val uri = "${props.authUrl}?" +
+        var uri = "${props.authUrl}?" +
                 "response_type=code&" +
                 "client_id=$clientId&" +
                 "redirect_uri=$redirectUri&" +
                 "scope=$scope"
 
+        val jwt =
+            if (user == null)
+                tokenService.createSessionToken()
+            else
+                tokenService.createSessionToken(user)
+
+        uri += "&state=$jwt"
+
         response.status = HttpStatus.FOUND.value()
         response.addHeader(HttpHeaders.LOCATION, uri)
-
-        user?.let {
-            val jwt = tokenService.createSessionToken(user)
-            response.addCookie(Cookie(oAuth2Props.sessionCookie.name, jwt))
-        }
     }
 }
